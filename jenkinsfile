@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[url: 'https://github.com/koteswararao798988/darwinbox-k8-hello.git']]])
+            }
+        }
+        stage('Package') {
+            steps {
+                sh 'docker build -t koteswararao798988/hello .'
+            }
+        }
+        stage('Publish') {
+            steps {
+                withCredentials([string(credentialsId: 'docker_pasw', variable: 'DOCKER_PASW')]) {
+                    sh "docker login -u koteswararao798988 -p \${DOCKER_PASW}"
+                    sh 'docker push koteswararao798988/hello'
+                }
+            }
+        }
+        stage('Deploy to k8s') {
+            steps {
+                sshagent(['kops-se']) {
+                    sh 'scp -o StrictHostKeyChecking=no manifest.yml ubuntu@54.177.11.218:/home/ubuntu'
+                    script {
+                        try {
+                            sh 'ssh ubuntu@54.177.11.218 kubectl apply -f manifest.yml'
+                        } catch (error) {
+                            sh 'ssh ubuntu@54.177.11.218 kubectl create -f manifest.yml'  
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
