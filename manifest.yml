@@ -21,7 +21,7 @@ spec:
           image: docker.io/koteswararao798988/hello:latest
           ports:
             - containerPort: 5000
-              hostPort: 80
+              hostPort: 5000
 
 ---
 
