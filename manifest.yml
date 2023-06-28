@@ -20,7 +20,7 @@ spec:
         - name: php-mongodb
           image: docker.io/koteswararao798988/hello:latest
           ports:
-            - containerPort: 80
+            - containerPort: 5000
               hostPort: 80
 
 ---
