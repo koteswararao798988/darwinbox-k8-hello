@@ -1,38 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: phpdeployment
-  labels:
-    type: app
-
+  name: python-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-       type: app
+      app: python-app
   template:
     metadata:
-      name: php-pod
       labels:
-        type: app
+        app: python-app
     spec:
       containers:
-        - name: php-mongodb
+        - name: python-app-container
           image: docker.io/koteswararao798988/hello:latest
           ports:
             - containerPort: 5000
-              hostPort: 5000
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: php-service
+  name: python-app-service
 spec:
   type: LoadBalancer
   ports:
-    - targetPort: 80
+    - protocol: TCP
       port: 80
+      targetPort: 5000
   selector:
-    type: app
+    app: python-app
